@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+	
+	<title>Editable Invoice</title>
+	
+	<link rel='stylesheet' type='text/css' href='/css/style.css' />
+	<link rel='stylesheet' type='text/css' href='/css/print.css' media="print" />
+	<script type='text/javascript' src='/js/jquery-1.4.2.min.js'></script>
+	<script type='text/javascript' src='/js/example.js'></script>
+	<script type='text/javascript'>
+  function update()
+  {
+      $("textarea").each(function (i) {
+          var src = $(this).html($(this).val());
+      });
+      intdue =  document.getElementById("due").innerHTML.replace(/[^.0-9]+/g,'');
+      intpaid =  document.getElementById("paid").value.replace(/[^.0-9]+/g,'');
+      $.post("/technicians/invoice",
+      { service_number: document.getElementById("servicenumber").innerHTML, customer_name: document.getElementById("customer-title").innerHTML, 
+        paid: intpaid, due: intdue, status: document.getElementById("status").value, 
+        invoice: document.getElementById("update").innerHTML },
+      function(data){
+        document.getElementById("response").innerHTML = data;
+      }
+    );
+  }
+  </script>
+
+</head>
+
+<body>
+<div id="update">
+{{ invoice }}
+</div>
+{{ technicians }}
+</body>
+
+</html>
