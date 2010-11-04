@@ -4,9 +4,6 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /invoice
-  script: main.py
-
 - url: /js
   static_dir: files/js
 
@@ -16,5 +13,5 @@ handlers:
 - url: /images
   static_dir: images/
 
-- url: /*
+- url: /
   script: main.py
