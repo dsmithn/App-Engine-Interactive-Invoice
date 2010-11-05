@@ -18,7 +18,7 @@
       });
       intdue =  document.getElementById("due").innerHTML.replace(/[^.0-9]+/g,'');
       intpaid =  document.getElementById("paid").value.replace(/[^.0-9]+/g,'');
-      $.post("/technicians/invoice",
+      $.post("/invoice",
       { service_number: document.getElementById("servicenumber").innerHTML, customer_name: document.getElementById("customer-title").innerHTML, 
         paid: intpaid, due: intdue, status: document.getElementById("status").value, 
         invoice: document.getElementById("update").innerHTML },
