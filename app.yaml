@@ -13,5 +13,11 @@ handlers:
 - url: /images
   static_dir: images/
 
+- url: /new
+  script: main.py
+  
+- url: /invoice
+  script: main.py  
+  
 - url: /
   script: main.py

@@ -331,7 +331,7 @@ class Invoice(webapp.RequestHandler):
         'technicians': '',
         }
 
-    path = os.path.join(os.path.dirname(__file__), 'invoice.html')
+    path = os.path.join(os.path.dirname(__file__), 'html/invoice.html')
     self.response.out.write(template.render(path, template_values))
 
   def post(self):
