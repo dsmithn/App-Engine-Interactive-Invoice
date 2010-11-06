@@ -24,7 +24,7 @@
         paid: intpaid, due: intdue, status: document.getElementById("status").value, 
         invoice: document.getElementById("update").innerHTML },
       function(data){
-        $('#response').html("Saved: " + data);
+        $('#response').html(data);
       }
     );
   }
@@ -33,10 +33,12 @@
 </head>
 
 <body>
+<div id="notification">
+{{ technicians }}
+</div>
 <div id="update">
 {{ invoice }}
 </div>
-{{ technicians }}
 </body>
 
 </html>

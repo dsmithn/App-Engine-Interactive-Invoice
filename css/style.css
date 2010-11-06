@@ -13,7 +13,7 @@ table { border-collapse: collapse; }
 table td, table th { border: 1px solid black; padding: 5px; }
 
 #header { height: 15px; width: 100%; margin: 20px 0; background: #222; text-align: center; color: white; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 8px 0px; }
-
+#notification { position: fixed; top: 0; left: 0; width: 200px; background: yellow; }
 #address { width: 250px; height: 150px; float: left; }
 #customer { overflow: hidden; }
 

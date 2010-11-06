@@ -43,7 +43,6 @@ class MainPage(webapp.RequestHandler):
   def get(self):
     self.response.out.write('<html><body>')
     user = users.get_current_user()
-
     if user:
       if users.is_current_user_admin():
         self.response.out.write("""<p> <input name="NewInvoice" type="button" value="New Invoice" onClick="location.href='/new'"> </p> """)
@@ -101,38 +100,24 @@ class Invoice(webapp.RequestHandler):
     service_number = self.request.get('service_number')
     q = Invoices.gql("where service_number = :number", number=service_number)
     user = users.get_current_user()
+    completed = ''
+    in_progress = ''
+    pre_service = ''
     for qr in q:
       if qr.status == 'In Progress':
-        technicians = """<p>
-        <select id="status">
-          <option value="Pre Service">Pre Service</option>
-          <option value="In Progress" selected="selected">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-        </p>
-                    <p><input name="saveInvoice" type="button" value="Save Invoice" onClick="update()"> <div id="response"></div></p><br>
-                    <p><input name="close" type="button" value="Close (Save First!)" onClick="parent.location='/'"> </p>"""
+        in_progress = """ selected="selected" """
       if qr.status == 'Completed':
-        technicians = """<p>
-        <select id="status">
-          <option value="Pre Service">Pre Service</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed" selected="selected">Completed</option>
-        </select>
-        </p>
-                    <p><input name="saveInvoice" type="button" value="Save Invoice" onClick="update()"> <div id="response"></div></p><br>
-                    <p><input name="close" type="button" value="Close (Save First!)" onClick="parent.location='/'"> </p>"""
+        completed = """ selected="selected" """
       elif qr.status == 'Pre Service':
-        technicians = """<p>
-        <select id="status">
-          <option value="Pre Service" selected="selected">Pre Service</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-        </p>
-                    <p><input name="saveInvoice" type="button" value="Save Invoice" onClick="update()"> <div id="response"></div></p><br>
-                    <p><input name="close" type="button" value="Close (Save First!)" onClick="parent.location='/'"> </p>"""
-      invoicehtml = qr.invoice
+        pre_service = """ selected="selected" """
+    invoicehtml = qr.invoice
+    invoice_values = {
+      'pre_service': pre_service,
+      'in_progress': in_progress,
+      'completed': completed,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'html/technician.html')
+    technicians = template.render(path, invoice_values)
     template_values = {
       'invoice': invoicehtml,
       'service_number': service_number,
@@ -142,24 +127,28 @@ class Invoice(webapp.RequestHandler):
     self.response.out.write(template.render(path, template_values))
 
   def post(self):
-    now = datetime.datetime.now()
-    updated_invoice = Invoices()
-    service_number = self.request.get('service_number')
-    query = Invoices.all()
-    query.filter('service_number =', service_number)
-    results = query.fetch(1)
-    for result in results:
-      updated_invoice.start_date = result.start_date      
-      updated_invoice.service_number = result.service_number
-      updated_invoice.customer_name = self.request.get('customer_name')
-      updated_invoice.balance_paid = float(self.request.get('paid'))
-      updated_invoice.balance_due = float(self.request.get('due'))
-      updated_invoice.invoice = self.request.get('invoice')
-      updated_invoice.status = self.request.get('status')
-      result.delete()
-    updated_invoice.put()
-    
-    self.response.out.write(str(now.strftime("%A, %B %d,  %Y %I:%M%p")))
+    user = users.get_current_user()
+    if user:
+      if users.is_current_user_admin():  
+        now = datetime.datetime.now()
+        updated_invoice = Invoices()
+        service_number = self.request.get('service_number')
+        query = Invoices.all()
+        query.filter('service_number =', service_number)
+        results = query.fetch(1)
+        for result in results:
+          updated_invoice.start_date = result.start_date      
+          updated_invoice.service_number = result.service_number
+          updated_invoice.customer_name = self.request.get('customer_name')
+          updated_invoice.balance_paid = float(self.request.get('paid'))
+          updated_invoice.balance_due = float(self.request.get('due'))
+          updated_invoice.invoice = self.request.get('invoice')
+          updated_invoice.status = self.request.get('status')
+          result.delete()
+        updated_invoice.put()    
+        self.response.out.write("Saved: " + str(now.strftime("%A, %B %d,  %Y %I:%M%p")))
+    else:
+      self.response.out.write("Error: Not logged in as admin.")
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
