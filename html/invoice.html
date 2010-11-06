@@ -13,6 +13,7 @@
 	<script type='text/javascript'>
   function update()
   {
+      
       $("textarea").each(function (i) {
           var src = $(this).html($(this).val());
       });
@@ -23,7 +24,7 @@
         paid: intpaid, due: intdue, status: document.getElementById("status").value, 
         invoice: document.getElementById("update").innerHTML },
       function(data){
-        document.getElementById("response").innerHTML = data;
+        $('#response').html("Saved: " + data);
       }
     );
   }
