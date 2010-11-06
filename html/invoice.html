@@ -13,7 +13,6 @@
 	<script type='text/javascript'>
   function update()
   {
-      
       $("textarea").each(function (i) {
           var src = $(this).html($(this).val());
       });
@@ -28,13 +27,22 @@
       }
     );
   }
+  function sign()
+  {
+      $.post("/invoice",
+      { initials: $('#initials').val(), service_number: $('#servicenumber').html() },
+      function(data){        
+        $('#notification').html(data);
+      }
+    );
+  }  
   </script>
 
 </head>
 
 <body>
 <div id="notification">
-{{ technicians }}
+{{ notification }}
 </div>
 <div id="update">
 {{ invoice }}

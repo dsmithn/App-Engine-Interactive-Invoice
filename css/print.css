@@ -1,3 +1,6 @@
+#notification {
+  display: none;
+}
 #hiderow,
 .delete {
   display: none;

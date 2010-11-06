@@ -83,7 +83,6 @@ class New(webapp.RequestHandler):
     invoice.service_number = service_number
     invoice.start_date = invoice.date
     invoice.status = 'Pre Service'
-
     template_values = {
       'service_number': service_number,
     }
@@ -97,19 +96,24 @@ class New(webapp.RequestHandler):
 class Invoice(webapp.RequestHandler):
   def get(self):
     technicians = ''
-    service_number = self.request.get('service_number')
-    q = Invoices.gql("where service_number = :number", number=service_number)
-    user = users.get_current_user()
     completed = ''
     in_progress = ''
     pre_service = ''
+    customer = ''    
+    service_number = self.request.get('service_number')
+    q = Invoices.gql("where service_number = :number", number=service_number)
+    user = users.get_current_user()
     for qr in q:
       if qr.status == 'In Progress':
         in_progress = """ selected="selected" """
-      if qr.status == 'Completed':
-        completed = """ selected="selected" """
+        customer = "<p>This Service is in progress.</p>"
       elif qr.status == 'Pre Service':
         pre_service = """ selected="selected" """
+        customer = "<p>This Service has not started yet.</p>"
+      if qr.status == 'Completed':
+        completed = """ selected="selected" """
+        path = os.path.join(os.path.dirname(__file__), 'html/customer.html')
+        customer = template.render(path, '')        
     invoicehtml = qr.invoice
     invoice_values = {
       'pre_service': pre_service,
@@ -121,21 +125,21 @@ class Invoice(webapp.RequestHandler):
     template_values = {
       'invoice': invoicehtml,
       'service_number': service_number,
-      'technicians': technicians if users.is_current_user_admin() else '',
+      'notification': technicians if users.is_current_user_admin() else customer,
     }
     path = os.path.join(os.path.dirname(__file__), 'html/invoice.html')
     self.response.out.write(template.render(path, template_values))
 
   def post(self):
     user = users.get_current_user()
+    now = datetime.datetime.now()
+    updated_invoice = Invoices()
+    service_number = self.request.get('service_number')
+    query = Invoices.all()
+    query.filter('service_number =', service_number)
+    results = query.fetch(1)    
     if user:
-      if users.is_current_user_admin():  
-        now = datetime.datetime.now()
-        updated_invoice = Invoices()
-        service_number = self.request.get('service_number')
-        query = Invoices.all()
-        query.filter('service_number =', service_number)
-        results = query.fetch(1)
+      if users.is_current_user_admin():          
         for result in results:
           updated_invoice.start_date = result.start_date      
           updated_invoice.service_number = result.service_number
@@ -148,7 +152,10 @@ class Invoice(webapp.RequestHandler):
         updated_invoice.put()    
         self.response.out.write("Saved: " + str(now.strftime("%A, %B %d,  %Y %I:%M%p")))
     else:
-      self.response.out.write("Error: Not logged in as admin.")
+      for result in results:
+        result.signature = self.request.get('initials')
+        result.put()
+      self.response.out.write("Signed: " + str(now.strftime("%A, %B %d,  %Y %I:%M%p")))
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
