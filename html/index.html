@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+    <title>Interactive Invoice</title>
+		<style type="text/css" title="currentStyle"> 
+			@import "/css/demo_page.css";
+			@import "/css/demo_table.css";
+		</style>
+		<style type="text/css"> 
+      #container {
+        width: 800px;
+      }
+		</style>    
+    <script type='text/javascript' src='/js/jquery-1.4.2.min.js'></script>
+    <script type='text/javascript' src='/js/jquery.dataTables.min.js'></script>
+    <script type='text/javascript'>
+    $(document).ready(function() {
+      $('#invoices').dataTable(
+        {
+          "sPaginationType": "full_numbers"
+        }
+      );
+    } );
+    </script>
+  </head>
+  <body>
+    <div id="container">
+      <p> <input name="NewInvoice" type="button" value="New Invoice" onClick="location.href='/new'"> </p> 
+      <p><a href="{{ logout }}">sign out</a></p>
+        <br>
+        <table cellpadding="0" cellspacing="0" border="0" class="display" id="invoices">
+        <thead>
+          <th>Service Number</th>
+          <th>Status</th><th>Signature</th>
+          <th>Customer Name</th>
+          <th>Amount Paid</th>
+          <th>Amount Due</th>
+          <th>Last Activity</th>
+          <th>Start Date</th>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+              <tr><td><a href="/invoice?service_number={{ invoice.service_number }}">{{ invoice.service_number }}<a></td>
+              <td>{{ invoice.status }}</td>
+              <td>{{ invoice.signature }}</td>
+              <td>{{ invoice.customer_name }}
+              <td>${{ invoice.balance_paid }}</td>       
+              <td><span style="color: #FF0000;">${{ invoice.balance_due}}</span></td>
+              <td>{{ invoice.date }}</td>
+              <td>{{ invoice.start_date }} </td></tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+          <th>Service Number</th>
+          <th>Status</th><th>Signature</th>
+          <th>Customer Name</th>
+          <th>Amount Paid</th>
+          <th>Amount Due</th>
+          <th>Last Activity</th>
+          <th>Start Date</th>
+        </tfoot>      
+        </table>    
+        Unpaid Total: <span style="color: #FF0000;">${{ total_due }}</span><br>
+    </div>
+  </body>
+</html>

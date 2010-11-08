@@ -41,31 +41,21 @@ class Invoices(db.Model):
 
 class MainPage(webapp.RequestHandler):
   def get(self):
-    self.response.out.write('<html><body>')
     user = users.get_current_user()
     if user:
       if users.is_current_user_admin():
-        self.response.out.write("""<p> <input name="NewInvoice" type="button" value="New Invoice" onClick="location.href='/new'"> </p> """)
-        self.response.out.write("<p><a href=\"%s\">sign out</a></p>" % users.create_logout_url("/"))
         invoices = Invoices.gql("ORDER BY date DESC")
-        output = '<br><table border="1"><th>Service Number</th><th>Status</th><th>Signature</th><th>Customer Name</th><th>Amount Paid</th><th>Amount Due</th><th>Last Activity</th><th>Start Date</th>'
         total_due = 0.00
         for invoice in invoices:
-          output += '<tr><td><a href="/invoice?service_number=%s">%s<a>' % (invoice.service_number,invoice.service_number)
-          output += '</td><td>' + str(invoice.status)
-          output += '</td><td>' + str(invoice.signature)
-          output += '</td><td>' + str(invoice.customer_name)
-          output += '</td><td>$' + str(invoice.balance_paid)          
-          output += '</td><td><span style="color: #FF0000;">$' + str(invoice.balance_due)
           if(invoice.balance_due): 
             total_due += invoice.balance_due
-          output += '</td><td>' + str(invoice.date)
-          output += '</span></td><td>     ' + str(invoice.start_date) + '</td></tr>'
-        output += """</table>
-          </body>
-          </html>"""
-        self.response.out.write('Unpaid Total: <span style="color: #FF0000;">$' + str(total_due) + '</span><br>')
-        self.response.out.write(output)
+        template_values = {
+          'logout': users.create_logout_url("/"),
+          'invoices': invoices,
+          'total_due': total_due,
+        }
+        path = os.path.join(os.path.dirname(__file__), 'html/index.html')
+        self.response.out.write(template.render(path, template_values))
       else:
         self.redirect(users.create_login_url(self.request.uri))
     else:

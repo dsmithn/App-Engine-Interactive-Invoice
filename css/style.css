@@ -16,6 +16,7 @@ table td, table th { border: 1px solid black; padding: 5px; }
 #notification { position: fixed; top: 0; left: 0; width: 200px; background: yellow; }
 #address { width: 250px; height: 150px; float: left; }
 #customer { overflow: hidden; }
+#customer-address { height: 100px; width: 200px;}
 
 #logo { text-align: right; float: right; position: relative; margin-top: 25px; border: 1px solid #fff; max-width: 540px; max-height: 100px; overflow: hidden; }
 #logo:hover, #logo.edit { border: 1px solid #000; margin-top: 0px; max-height: 125px; }
