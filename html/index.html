@@ -3,21 +3,23 @@
   <head>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
     <title>Interactive Invoice</title>
-		<style type="text/css" title="currentStyle"> 
-			@import "/css/demo_page.css";
-			@import "/css/demo_table.css";
-		</style>
-		<style type="text/css"> 
+		<style type="text/css">
       #container {
-        width: 800px;
+        margin-right: auto;
+        margin-left: auto;      
+        width: 980px;
       }
-		</style>    
+		</style>
+    <link rel='stylesheet' type='text/css' href='/css/demo_page.css' />
+    <link rel='stylesheet' type='text/css' href='/css/demo_table_jui.css' />
+    <link rel='stylesheet' type='text/css' href='/css/smoothness/jquery-ui-1.8.6.custom.css' />
     <script type='text/javascript' src='/js/jquery-1.4.2.min.js'></script>
     <script type='text/javascript' src='/js/jquery.dataTables.min.js'></script>
     <script type='text/javascript'>
     $(document).ready(function() {
       $('#invoices').dataTable(
         {
+          "bJQueryUI": true,
           "sPaginationType": "full_numbers"
         }
       );
@@ -50,16 +52,7 @@
               <td>{{ invoice.date }}</td>
               <td>{{ invoice.start_date }} </td></tr>
             {% endfor %}
-        </tbody>
-        <tfoot>
-          <th>Service Number</th>
-          <th>Status</th><th>Signature</th>
-          <th>Customer Name</th>
-          <th>Amount Paid</th>
-          <th>Amount Due</th>
-          <th>Last Activity</th>
-          <th>Start Date</th>
-        </tfoot>      
+        </tbody>     
         </table>    
         Unpaid Total: <span style="color: #FF0000;">${{ total_due }}</span><br>
     </div>
